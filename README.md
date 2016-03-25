@@ -1,8 +1,10 @@
-# heroprotocoljs
+# heroprotocol
 
-heroprotocoljs is a Javascript port of [heroprotocol](https://github.com/Blizzard/heroprotocol). It is a library and standalone tool to decode Heroes of the Storm replay files into Javascript data structures.
+heroprotocol is a Javascript port of [Blizzard/heroprotocol](https://github.com/Blizzard/heroprotocol).
+It is a library and standalone tool to decode Heroes of the Storm replay files into Javascript data
+structures.
 
-Currently heroprotocoljs can decode these structures and events:
+Currently heroprotocol can decode these structures and events:
 
 - replay header
 - game details
@@ -11,14 +13,29 @@ Currently heroprotocoljs can decode these structures and events:
 - message events
 - tracker events
 
-heroprotocoljs can be used as a base-build-specific library to decode binary blobs, or it can be run as a standalone tool to pretty print information from supported replay files.
+heroprotocol can be used as a base-build-specific library to decode binary blobs, or it can be run as a standalone tool to pretty print information from supported replay files.
 
-Note that heroprotocoljs does not expose game balance information or provide any kind of high level analysis of replays; it's meant
+Note that heroprotocol does not expose game balance information or provide any kind of high level analysis of replays; it's meant
 to be just the first tool in the chain for your data mining application.
+
+## What The Fork?
+
+I first want to thank Mathieu Merdy ([Farof](https://github.com/Farof)) for doing most of the work
+on this repo in his origin repository [heroprotocoljs](https://github.com/Farof/heroprotocoljs).
+I, in no way, want to steal credit or cause confusion.
+
+The reason for this fork is to keep up with my speed of development and implement the features I
+believe should be the extraction library.
+
+Mathieu did a wonderful job with the initial import and product direction, but unfortunately has
+not been as active on the product as I have hoped.  It is with regret that I have to fork to
+continue development, but I hope that Mathieu understands and continues development.
+
+Justin
 
 ## Installation
 
-    npm install -S heroprotocoljs
+    npm install heroprotocol --save
 
 ## Usage
 
@@ -46,7 +63,7 @@ Output:
 
 ### As a command line tool
 
-    $ bin/heroprotocol.js map.StormReplay -H --json
+    $ node bin/heroprotocol.js map.StormReplay -H --json
 
   Outputs the `map.StormReplay` replay header in JSON format.
 
@@ -107,7 +124,7 @@ The following files are in the archive but not supported by this port nor the or
 
 ## Supported Versions
 
-heroprotocoljs supports all protocols avalaible in the original library and can read all replays from retail versions of the game, up to and including patch 16.0. The plan is to port all future versions as they become available.
+heroprotocol supports all protocols avalaible in the original library and can read all replays from retail versions of the game, up to and including patch 16.0. The plan is to port all future versions as they become available.
 
 ### How it works
 
@@ -129,11 +146,19 @@ Any small or big contribution appreciated whether in code, documentation, feedba
 
 ## Acknowledgements
 
+[Mathieu Merdy](https://github.com/Farof) for the initial implementation.
+
+--
+
 Blizzard Entertainment for making the awesome Heroes of the Storm game and releasing the original [heroprotocol](https://github.com/Blizzard/heroprotocol) tool.
 
 The standalone tool uses a javascript port of [mpyq](https://github.com/arkx/mpyq/) to read mopaq files.
 
 ## License
+
+Copyright (c) 2016, Justin J. Novack
+
+---
 
 Copyright (c) 2016, Mathieu Merdy
 
