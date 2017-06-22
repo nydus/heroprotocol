@@ -2,7 +2,18 @@
 
 # latest
 
-- Fixed issue with `lib/decoders.js` that prevented use of the `initdata` flag
+- Fixed issue with `lib/decoders.js` that prevented use of the `initdata` flag.
+
+# 0.3.1 - 2016-03-24
+
+- Fixed issue with bitwise operators on numbers above 32 bits.
+
+# 0.3.0 - 2016-03-21
+
+- Changed dependencies
+- Uses normalized paths
+- Made output more orderly
+- Fixed typos and failure tests
 
 # 0.2.2 - 2016-03-19
 
