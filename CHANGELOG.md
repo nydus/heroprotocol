@@ -2,6 +2,10 @@
 
 # latest
 
+- Fixed issue with `lib/decoders.js` that prevented use of the `initdata` flag
+
+# 0.2.2 - 2016-03-19
+
 - Automated protocol port
 
 # 0.2.1 - 2016-01-31
