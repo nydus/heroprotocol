@@ -94,7 +94,7 @@ exports.open = function (file, noCache) {
 };
 
 // returns the content of a file in a replay archive
-exports.get = function (archiveFile, archive) {
+exports.get = function (archiveFile, archive, keys) {
   let data;
   archive = exports.open(archive);
 
@@ -102,22 +102,45 @@ exports.get = function (archiveFile, archive) {
     return data;
   }
 
-  if (archive.data[archiveFile]) {
+  if (archive.data[archiveFile] && !keys) {
     data = archive.data[archiveFile];
   } else {
     if (archive.protocol) {
+
       if ([DETAILS, INITDATA, ATTRIBUTES_EVENTS].indexOf(archiveFile) > -1) {
         data = archive.data[archiveFile] =
           parseStrings(archive.protocol[decoderMap[archiveFile]](
             archive.readFile(archiveFile)
           ));
       } else if ([GAME_EVENTS, MESSAGE_EVENTS, TRACKER_EVENTS].indexOf(archiveFile) > -1) {
-        // protocol function to call is a generator
-        data = archive.data[archiveFile] = [];
-        for (let event of archive.protocol[decoderMap[archiveFile]](archive.readFile(archiveFile))) {
-          data.push(parseStrings(event));
+
+        if (keys) {
+          // protocol function to call is a generator
+          data = [];
+          for (let event of archive.protocol[decoderMap[archiveFile]](archive.readFile(archiveFile))) {
+
+            keyLoop:
+            // check validity with whitelisted keys
+            for (var key in keys) {
+              for (var i = 0, j = keys[key].length; i < j; i++) {
+                if (parseStrings(event)[key] === keys[key][i]){
+                    data.push(parseStrings(event));
+                    break keyLoop;
+                }
+              }
+            }
+
+          }
+
+        } else {
+          data = archive.data[archiveFile] = [];
+          for (let event of archive.protocol[decoderMap[archiveFile]](archive.readFile(archiveFile))) {
+            data.push(parseStrings(event));
+          }
         }
+
       }
+
     }
   }
 
