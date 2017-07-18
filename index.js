@@ -40,49 +40,55 @@ const parseStrings = function parseStrings(data) {
 
 let lastUsed;
 
-exports.open = function (file) {
+exports.open = function (file, noCache) {
   let archive, header;
 
-  // TODO - should we check if the user is trying to open the lastUsed file
-  // and return the cache or assume they know what they're doing? Need usecase.
+  if (!lastUsed || !(lastUsed instanceof MPQArchive) || file !== lastUsed.filename || noCache) {
 
-  if (typeof file === 'string') {
-    try {
-      if (!path.isAbsolute(file)) {
-        file = path.join(process.cwd(), file);
+    if (typeof file === 'string') {
+      try {
+        if (!path.isAbsolute(file)) {
+          file = path.join(process.cwd(), file);
+        }
+        archive = new MPQArchive(file);
+        archive.filename = file;
+      } catch (err) {
+        archive = err;
       }
-      archive = new MPQArchive(file);
-      archive.filename = file;
-    } catch (err) {
-      archive = err;
+    } else if (file instanceof MPQArchive) {
+      // TODO - need to check what happens when instanciating an MPQArchive with
+      // invalid path and setup an error accordingly
+      archive = file;
+    } else {
+      archive = new Error('Unsupported parameter: ${file}');
     }
-  } else if (file instanceof MPQArchive) {
-    // TODO - need to check what happens when instanciating an MPQArchive with
-    // invalid path and setup an error accordingly
-    archive = file;
+
+    if (archive instanceof Error) return archive;
+    lastUsed = archive;
+
+    // parse header
+    archive.data = {};
+    header = archive.data[HEADER] = parseStrings(protocol29406.decodeReplayHeader(archive.header.userDataHeader.content));
+    // The header's baseBuild determines which protocol to use
+    archive.baseBuild = header.m_version.m_baseBuild;
+
+    try {
+      archive.protocol = require(`./lib/protocol${archive.baseBuild}`);
+    } catch (err) {
+      archive.error = err;
+    }
+
+    // set header to proper protocol
+    archive.data[HEADER] = parseStrings(archive.protocol.decodeReplayHeader(archive.header.userDataHeader.content));
+
+    archive.get = function (file) {
+      return exports.get(file, archive);
+    };
+
   } else {
-    archive = new Error('Unsupported parameter: ${file}');
+    // load archive from cache
+    archive = lastUsed;
   }
-
-  if (archive instanceof Error) return archive;
-  lastUsed = archive;
-
-  // parse header
-  archive.data = {};
-  header = archive.data[HEADER] = parseStrings(protocol29406.decodeReplayHeader(archive.header.userDataHeader.content));
-  // The header's baseBuild determines which protocol to use
-  archive.baseBuild = header.m_version.m_baseBuild;
-
-  try {
-    archive.protocol = require(`./lib/protocol${archive.baseBuild}`);
-  } catch (err) {
-    archive.error = err;
-  }
-
-  archive.get = function (file) {
-    return exports.get(file, archive);
-  };
-
 
   return archive;
 };
@@ -90,11 +96,7 @@ exports.open = function (file) {
 // returns the content of a file in a replay archive
 exports.get = function (archiveFile, archive) {
   let data;
-  if (!lastUsed || !(archive instanceof MPQArchive) || archive !== lastUsed.filename) {
-    archive = exports.open(archive);
-  } else {
-    lastUsed = archive;
-  }
+  archive = exports.open(archive);
 
   if (archive instanceof Error) {
     return data;
