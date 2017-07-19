@@ -5,6 +5,7 @@
 - Added ability to whitelist game, message, and tracker events based on key-value matches
 - Improved archive caching and added a boolean argument to `.open` that controls whether a cached version should be loaded (if possible).
 - Fixed issue with `header` always being archived under `protocol29406` instead of the proper build.
+- Oldest build tested is build `44256`.
 
 # 0.3.2 - 2017-06-22
 
