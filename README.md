@@ -15,6 +15,8 @@ Currently heroprotocol can decode these structures and events:
 
 heroprotocol can be used as a base-build-specific library to decode binary blobs, or it can be run as a standalone tool to pretty print information from supported replay files.
 
+The latest version of this library has been tested and passed with builds 44256 and higher of HoTS replays. Although it is unlikely that you should encounter any issues for older versions, no testing has been done for any replays older than 44256.
+
 Note that heroprotocol does not expose game balance information or provide any kind of high level analysis of replays; it's meant
 to be just the first tool in the chain for your data mining application.
 
