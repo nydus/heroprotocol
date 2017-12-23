@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const MPQArchive = exports.MPQArchive = require('mpyqjs/mpyq').MPQArchive;
+const MPQArchive = exports.MPQArchive = require('empeeku/mpyq').MPQArchive;
 const protocol29406 = exports.protocol =  require('./lib/protocol29406');
 
 const version = exports.version = require('./package.json').version;
