@@ -7,11 +7,13 @@ const download = require("download-github-repo");
 const _data = require(path.normalize(__dirname+'/lib/data'));
 const _template = path.normalize(__dirname+'/config/protocol.js.template');
 
-const repository = 'Blizzard/heroprotocol';
+const repositories = ['Blizzard/heroprotocol', 'Blizzard/s2protocol'];
 const cloneDir = path.normalize(__dirname+'/src');
 const outDir = path.normalize(__dirname+'/lib');
 
-function getHeroprotocol() {
+const minimumProtocolVersion = 29406;
+
+function getProtocols() {
   return new Promise((resolve, reject) => {
     fs.mkdirp(cloneDir, err => {
       if (err) reject;
@@ -19,16 +21,18 @@ function getHeroprotocol() {
       fs.readdir(cloneDir, (err, contents) => {
         if (err) reject;
 
-        console.log("Downloading https://github.com/" + repository + " ...");
+        repositories.forEach(repository => {
+          console.log("Downloading https://github.com/" + repository + " ...");
 
-        download(repository, cloneDir, err => {
-          if (!err)
-            resolve();
-          else {
-            console.error(err);
-            console.error("Error downloading https://github.com/" + repository);
-            process.exit(1);
-          }
+          download(repository, cloneDir, err => {
+            if (!err)
+              resolve();
+            else {
+              console.error(err);
+              console.error("Error downloading https://github.com/" + repository);
+              process.exit(1);
+            }
+          });
         });
       });
     });
@@ -343,9 +347,11 @@ const Protocol = exports.Protocol = class {
   }
 };
 
-getHeroprotocol().then(() => {
+getProtocols().then(() => {
   const files = fs.readdirSync(cloneDir).filter(file => {
-    return file.match(/protocol(\d+)\.py$/);
+    const match = file.match(/protocol(\d+)\.py$/);
+    const protocolVersion = match ? parseInt(match[1]) : -1;
+    return match && protocolVersion >= minimumProtocolVersion;
   });
   const successes = [];
   const failures = [];
