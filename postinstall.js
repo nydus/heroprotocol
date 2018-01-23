@@ -1,38 +1,45 @@
 "use strict";
 
 const fs = require('fs-extra');
+const klawSync = require('klaw-sync');
 const path = require('path');
 const download = require("download-github-repo");
 
 const _data = require(path.normalize(__dirname+'/lib/data'));
 const _template = path.normalize(__dirname+'/config/protocol.js.template');
 
-const repository = 'Blizzard/heroprotocol';
+const repositories = ['Blizzard/heroprotocol', 'Blizzard/s2protocol'];
 const cloneDir = path.normalize(__dirname+'/src');
 const outDir = path.normalize(__dirname+'/lib');
 
-function getHeroprotocol() {
-  return new Promise((resolve, reject) => {
-    fs.mkdirp(cloneDir, err => {
-      if (err) reject;
+const minimumProtocolVersion = 29406;
 
-      fs.readdir(cloneDir, (err, contents) => {
+function getProtocols() {
+  return Promise.all(repositories.map(repository => {
+    return new Promise((resolve, reject) => {
+      const repoDir = path.normalize(path.join(cloneDir, repository));
+
+      fs.mkdirp(repoDir, err => {
         if (err) reject;
 
-        console.log("Downloading https://github.com/" + repository + " ...");
+        fs.readdir(cloneDir, (err, contents) => {
+          if (err) reject;
 
-        download(repository, cloneDir, err => {
-          if (!err)
-            resolve();
-          else {
-            console.error(err);
-            console.error("Error downloading https://github.com/" + repository);
-            process.exit(1);
-          }
+          console.log("Downloading https://github.com/" + repository + " ...");
+
+          download(repository, repoDir, err => {
+            if (!err)
+              resolve();
+            else {
+              console.error(err);
+              console.error("Error downloading https://github.com/" + repository);
+              process.exit(1);
+            }
+          });
         });
       });
     });
-  });
+  }));
 }
 
 const types = {
@@ -343,16 +350,21 @@ const Protocol = exports.Protocol = class {
   }
 };
 
-getHeroprotocol().then(() => {
-  const files = fs.readdirSync(cloneDir).filter(file => {
-    return file.match(/protocol(\d+)\.py$/);
+getProtocols().then(() => {
+  const files = klawSync(cloneDir, {
+    nodir: true,
+    filter: file => {
+      const match = file.path.match(/protocol(\d+)\.py$/);
+      const protocolVersion = match ? parseInt(match[1]) : -1;
+      return match && protocolVersion >= minimumProtocolVersion;
+    }
   });
   const successes = [];
   const failures = [];
 
   Promise.all(files.map(file => {
     return new Promise((resolve, reject) => {
-      const proto = new Protocol(`${cloneDir}/${file}`);
+      const proto = new Protocol(file.path);
       proto.parse().then(() => {
         proto.write().then(() => {
           successes.push(proto.jsName);
@@ -377,6 +389,6 @@ getHeroprotocol().then(() => {
       process.exit(2);
   }).catch(console.log);
 }, () => {
-  console.error('Failed to fetch files from',repository);
+  console.error('Failed to fetch files from', repositories);
   process.exit(1);
 });
