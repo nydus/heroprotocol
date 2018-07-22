@@ -22,6 +22,15 @@ const GAME_EVENTS       = exports.GAME_EVENTS       = 'replay.game.events';
 const MESSAGE_EVENTS    = exports.MESSAGE_EVENTS    = 'replay.message.events';
 const TRACKER_EVENTS    = exports.TRACKER_EVENTS    = 'replay.tracker.events';
 const ATTRIBUTES_EVENTS = exports.ATTRIBUTES_EVENTS = 'replay.attributes.events';
+const FILES             = exports.FILES             = [
+  HEADER,
+  DETAILS,
+  INITDATA,
+  GAME_EVENTS,
+  MESSAGE_EVENTS,
+  TRACKER_EVENTS,
+  ATTRIBUTES_EVENTS
+];
 
 const decoderMap = {
   [HEADER]:             'decodeReplayHeader',
