@@ -815,3 +815,76 @@ Mount and coloring
 
 * `yes`
 * `no`
+
+## 1.0.20 `4021` Draft Ban Mode - (array(object(int attrid, int namespace, string value)))
+
+### 1.0.20.1 `value` (string)
+
+* `` - (Empty string) No Ban
+* `1ban` - 1 Beginning Ban
+* `2ban` - 2 Beginning Bans
+* `Mban` - Mid-Ban style (1 beginning ban, 1 mid-ban)
+
+## 1.0.21 `4022` Ban Selector - (array(object(int attrid, int namespace, string value)))
+
+### 1.0.21.1 `value` (string)
+
+* `Hmmr` - Highest MMR Player
+
+## 1.0.22 `4023` Team 1, First Ban - (array(object(int attrid, int namespace, string value)))
+
+### 1.0.22.1 `value` (string)
+
+Hero Played. See 1.0.11
+
+## 1.0.23 `4024` Team 1, First Ban Locked In - (array(object(int attrid, int namespace, string value)))
+
+### 1.0.23.1 `value` (string)
+
+* `yes`
+* `no`
+
+## 1.0.24 `4025` Team 1, Second Ban - (array(object(int attrid, int namespace, string value)))
+
+### 1.0.24.1 `value` (string)
+
+Hero Played. See 1.0.11
+
+## 1.0.25 `4026` Team 1, Second Ban Locked In - (array(object(int attrid, int namespace, string value)))
+
+### 1.0.25.1 `value` (string)
+
+* `yes`
+* `no`
+
+## 1.0.26 `4027` Ban Selector - (array(object(int attrid, int namespace, string value)))
+
+### 1.0.26.1 `value` (string)
+
+* `Hmmr` - Highest MMR Player
+
+## 1.0.27 `4028` Team 2, First Ban - (array(object(int attrid, int namespace, string value)))
+
+### 1.0.27.1 `value` (string)
+
+Hero Played. See 1.0.11
+
+## 1.0.28 `4029` Team 2, First Ban Locked In - (array(object(int attrid, int namespace, string value)))
+
+### 1.0.28.1 `value` (string)
+
+* `yes`
+* `no`
+
+## 1.0.29 `4030` Team 2, Second Ban - (array(object(int attrid, int namespace, string value)))
+
+### 1.0.29.1 `value` (string)
+
+Hero Played. See 1.0.11
+
+## 1.0.30 `4031` Team 2, Second Ban Locked In - (array(object(int attrid, int namespace, string value)))
+
+### 1.0.30.1 `value` (string)
+
+* `yes`
+* `no`
