@@ -251,6 +251,7 @@ exports.parseHeader = function (buffer) {
  */
 exports.parseFile = function (filename, buffer, build) {
   let data, protocol;
+  debug('parseFile() : ' + filename + ", " + build);
 
   try {
     protocol = require(`./lib/protocol${build}`);
