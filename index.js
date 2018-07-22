@@ -2,10 +2,17 @@
 
 const fs = require('fs');
 const path = require('path');
+const debug = require('debug')('heroprotocol');
 const MPQArchive = exports.MPQArchive = require('empeeku/mpyq').MPQArchive;
 const protocol29406 = exports.protocol =  require('./lib/protocol29406');
-
 const version = exports.version = require('./package.json').version;
+
+try {
+  var optional = require('storm-replay');
+} catch (err) {
+  optional = null;
+}
+const storm = optional;
 
 // parsable parts
 const HEADER            = exports.HEADER            = 'header';
@@ -148,6 +155,74 @@ exports.get = function (archiveFile, archive, keys) {
 };
 
 /**
+ * extract all files from archive via cpp binding
+ * @function
+ * @param {string} archive - Path of the MPQ archive
+ * @returns {object} Object of files as buffers
+ */
+exports.extractFiles = (archive) => {
+  if (typeof archive === 'string') {
+    if (!path.isAbsolute(archive)) {
+      archive = path.join(process.cwd(), archive);
+    }
+  }
+  debug('extractFiles() : ' + archive);
+  let header = exports.parseHeader(storm.getHeader(archive).content.data);
+  let data = [];
+
+  for (var i = FILES.length - 1; i >= 0; i--) {
+    data[FILES[i]] = exports.extractFile(FILES[i], archive);
+  }
+  return data;
+};
+
+/**
+ * extract all files from archive via cpp binding
+ * @function
+ * @param {string} file - Filename to extract
+ * @param {string} archive - Path of the MPQ archive
+ * @returns {object} Object of files as buffers
+ */
+exports.extractFile = (file, archive) => {
+  if (typeof archive === 'string') {
+    if (!path.isAbsolute(archive)) {
+      archive = path.join(process.cwd(), archive);
+    }
+  }
+  let build = exports.getVersion(archive);
+  debug('extractFile() : ' + file + ', ' + archive);
+
+  if (file === 'header') {
+    return exports.parseHeader(storm.getHeader(archive).content.data);
+  }
+
+  let result = storm.extractFile(archive, file);
+  if (result.success == false) {
+    debug(JSON.stringify(result));
+  }
+
+  return exports.parseFile(file, result.content.data, build);
+};
+
+/**
+ * gets the build version of the replay, and preloads the decoding library
+ * @function
+ * @param {string} archive - Path of the MPQ archive
+ * @returns {integer} Build number
+ */
+exports.getVersion = (archive) => {
+  if (typeof archive === 'string') {
+    if (!path.isAbsolute(archive)) {
+      archive = path.join(process.cwd(), archive);
+    }
+  }
+  let header = exports.parseHeader(storm.getHeader(archive).content.data);
+  protocol = require(`./lib/protocol${header.m_dataBuildNum}`);
+  build = header.m_dataBuildNum;
+  return header.m_dataBuildNum;
+};
+
+/**
  * parses a basic MPQ header
  * @function
  * @param {buffer} buffer - Header content from MPQ archive
@@ -185,3 +260,9 @@ exports.parseFile = function (filename, buffer, build) {
 
   return data;
 };
+
+if (['darwin', 'linux'].indexOf(process.platform) > -1) {
+  exports.stormVersion = storm.version;
+} else {
+  exports.stormVersion = "0.0.0-unavailable";
+}
