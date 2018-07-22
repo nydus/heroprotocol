@@ -20,6 +20,8 @@ The latest version of this library has been tested and passed with builds 44256 
 Note that heroprotocol does not expose game balance information or provide any kind of high level analysis of replays; it's meant
 to be just the first tool in the chain for your data mining application.
 
+As of version 2.0, MacOS and Linux are using a compiled library (e.g. C++, as opposed to interpreted library, e.g. Javascript) for extraction ([`storm-replay`](https://github.com/nydus/storm-replay)) and results in about 40% faster processing.  If you are on Windows, please upgrade.
+
 ## What The Fork?
 
 I first want to thank Mathieu Merdy ([Farof](https://github.com/Farof)) for doing most of the work
