@@ -2,6 +2,12 @@
 
 # latest
 
+# 2.0.0-alpha.1
+
+- Add in support for `storm-replay` for intelligent OSes (MacOS and Linux)
+
+# 1.0.1
+
 - Added ability to whitelist game, message, and tracker events based on key-value matches
 - Improved archive caching and added a boolean argument to `.open` that controls whether a cached version should be loaded (if possible).
 - Fixed issue with `header` always being archived under `protocol29406` instead of the proper build.
