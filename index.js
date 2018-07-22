@@ -54,9 +54,11 @@ const parseStrings = function parseStrings(data) {
   return data;
 };
 
-let lastUsed;
+let lastUsed, protocol;
+let build = 0;
 
-exports.open = function (file, noCache) {
+const openArchive = function (file, noCache) {
+  debug('openArchive() : ' + file + ', ' + noCache);
   let archive, header;
 
   if (!lastUsed || !(lastUsed instanceof MPQArchive) || file !== lastUsed.filename || noCache) {
@@ -86,7 +88,7 @@ exports.open = function (file, noCache) {
     archive.data = {};
     header = archive.data[HEADER] = parseStrings(protocol29406.decodeReplayHeader(archive.header.userDataHeader.content));
     // The header's baseBuild determines which protocol to use
-    archive.baseBuild = header.m_version.m_baseBuild;
+    archive.baseBuild = build = header.m_version.m_baseBuild;
 
     try {
       archive.protocol = require(`./lib/protocol${archive.baseBuild}`);
@@ -109,10 +111,22 @@ exports.open = function (file, noCache) {
   return archive;
 };
 
+// ensure non-breaking changes
+exports.get = (file, archive) => {
+  debug('get() : ' + file + ', ' + archive);
+  if (['darwin', 'linux'].indexOf(process.platform) > -1) {
+    return exports.extractFile(file, archive)
+  } else {
+    console.warn('heroprotocol.js is using Javascript extraction, which is notably slower and will be re-written in the future. See README.md for more details.');
+    return exports.extractFileJS(file, archive)
+  }
+}
+
 // returns the content of a file in a replay archive
-exports.get = function (archiveFile, archive, keys) {
+exports.extractFileJS = function (archiveFile, archive, keys) {
+  debug('extractFileJS() : ' + archiveFile + ', ' + archive);
   let data;
-  archive = exports.open(archive);
+  archive = openArchive(archive);
 
   if (archive instanceof Error) {
     return data;
