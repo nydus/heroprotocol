@@ -138,11 +138,13 @@ exports.extractFileJS = function (archiveFile, archive, keys) {
     if (archive.protocol) {
 
       if ([DETAILS, INITDATA, ATTRIBUTES_EVENTS].indexOf(archiveFile) > -1) {
+        debug('extractFileJS() : ' + filename + ' - parsing file');
         data = archive.data[archiveFile] =
           parseStrings(archive.protocol[decoderMap[archiveFile]](
             archive.readFile(archiveFile)
           ));
       } else if ([GAME_EVENTS, MESSAGE_EVENTS, TRACKER_EVENTS].indexOf(archiveFile) > -1) {
+        debug('extractFileJS() : ' + filename + ' - parsing lines iteratively');
 
         if (keys) {
           // protocol function to call is a generator
@@ -169,6 +171,9 @@ exports.extractFileJS = function (archiveFile, archive, keys) {
           }
         }
 
+      } else {
+        debug('extractFileJS() : ' + filename + ' - not parsing');
+        data = archive.data[archiveFile] = buffer;
       }
 
     }
