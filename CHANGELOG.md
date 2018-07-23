@@ -2,9 +2,11 @@
 
 # latest
 
-# 2.0.0-alpha.1
+# 2.0.0-alpha
 
 - Add in support for `storm-replay` for intelligent OSes (MacOS and Linux)
+- Docker
+- Files unprocessed (battlelobby, etc) will be passed through as buffers.
 
 # 1.0.1
 

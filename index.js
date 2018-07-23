@@ -265,7 +265,6 @@ exports.parseHeader = function (buffer) {
  */
 exports.parseFile = function (filename, buffer, build) {
   let data, protocol;
-  debug('parseFile() : ' + filename + ", " + build);
 
   try {
     protocol = require(`./lib/protocol${build}`);
@@ -274,12 +273,17 @@ exports.parseFile = function (filename, buffer, build) {
   }
 
   if ([DETAILS, INITDATA, ATTRIBUTES_EVENTS].indexOf(filename) > -1) {
+    debug('parseFile() : ' + filename + " (build " + build + ") - parsing entire file");
     data = parseStrings(protocol[decoderMap[filename]](buffer));
   } else if ([GAME_EVENTS, MESSAGE_EVENTS, TRACKER_EVENTS].indexOf(filename) > -1) {
+    debug('parseFile() : ' + filename + " (build " + build + ") - parsing lines iteratively");
     data = [];
     for (let event of protocol[decoderMap[filename]](buffer)) {
       data.push(parseStrings(event));
     }
+  } else {
+    debug('parseFile() : ' + filename + " (build " + build + ") - not parsing");
+    data = buffer;
   }
 
   return data;
