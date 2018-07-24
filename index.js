@@ -11,6 +11,7 @@ try {
   var optional = require('storm-replay');
 } catch (err) {
   optional = null;
+  console.warn('heroprotocol.js is using Javascript extraction, which is notably slower and will be re-written in the future. See README.md for more details.');
 }
 const storm = optional;
 
@@ -117,7 +118,6 @@ exports.get = (file, archive) => {
   if (['darwin', 'linux'].indexOf(process.platform) > -1) {
     return exports.extractFile(file, archive)
   } else {
-    console.warn('heroprotocol.js is using Javascript extraction, which is notably slower and will be re-written in the future. See README.md for more details.');
     return exports.extractFileJS(file, archive)
   }
 }
