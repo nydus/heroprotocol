@@ -297,5 +297,5 @@ exports.parseFile = function (filename, buffer, build) {
 if (['darwin', 'linux'].indexOf(process.platform) > -1) {
   exports.stormVersion = storm.version;
 } else {
-  exports.stormVersion = "0.0.0-unavailable";
+  exports.stormVersion = undefined;
 }

@@ -14,16 +14,17 @@ describe('test extraction methods', function(){
         for (var i = heroprotocol.FILES.length - 1; i >= 0; i--) {
             heroprotocol.get(heroprotocol.FILES[i], 'alterac-pass.StormReplay');
         }
-    });
-
-
-    it('storm-replay extraction', function() {
         Object.defineProperty(process, 'platform', {
             value: this.originalPlatform
         });
-        for (var i = heroprotocol.FILES.length - 1; i >= 0; i--) {
-            heroprotocol.get(heroprotocol.FILES[i], 'alterac-pass.StormReplay');
-        }
     });
+
+    if (heroprotocol.stormVersion !== undefined) {
+        it('storm-replay extraction', function() {
+            for (var i = heroprotocol.FILES.length - 1; i >= 0; i--) {
+                heroprotocol.get(heroprotocol.FILES[i], 'alterac-pass.StormReplay');
+            }
+        });
+    }
 
 });
