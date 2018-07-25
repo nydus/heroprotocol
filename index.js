@@ -173,7 +173,7 @@ exports.extractFileJS = function (archiveFile, archive, keys) {
 
       } else {
         log.trace('extractFileJS() : ' + archiveFile + ' - not parsing');
-        data = archive.data[archiveFile] = buffer;
+        data = archive.data[archiveFile] = archive.readFile(archiveFile);
       }
 
     }
