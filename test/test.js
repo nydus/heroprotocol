@@ -12,7 +12,7 @@ describe('test extraction methods', function(){
             value: 'win'
         });
         for (var i = heroprotocol.FILES.length - 1; i >= 0; i--) {
-            heroprotocol.get(heroprotocol.FILES[i], 'alterac-pass.StormReplay');
+            heroprotocol.get(heroprotocol.FILES[i], 'test/replays/towers-of-doom.StormReplay');
         }
         Object.defineProperty(process, 'platform', {
             value: this.originalPlatform
@@ -22,7 +22,7 @@ describe('test extraction methods', function(){
     if (heroprotocol.stormVersion !== undefined) {
         it('storm-replay extraction', function() {
             for (var i = heroprotocol.FILES.length - 1; i >= 0; i--) {
-                heroprotocol.get(heroprotocol.FILES[i], 'alterac-pass.StormReplay');
+                heroprotocol.get(heroprotocol.FILES[i], 'test/replays/towers-of-doom.StormReplay');
             }
         });
     }
