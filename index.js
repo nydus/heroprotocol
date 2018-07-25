@@ -1,8 +1,8 @@
 "use strict";
 
+const log = require('./pino.js');
 const fs = require('fs');
 const path = require('path');
-const debug = require('debug')('heroprotocol');
 const MPQArchive = exports.MPQArchive = require('empeeku/mpyq').MPQArchive;
 const protocol29406 = exports.protocol =  require('./lib/protocol29406');
 const version = exports.version = require('./package.json').version;
@@ -11,7 +11,7 @@ try {
   var optional = require('storm-replay');
 } catch (err) {
   optional = null;
-  console.warn('heroprotocol.js is using Javascript extraction, which is notably slower and will be re-written in the future. See README.md for more details.');
+  log.warn('heroprotocol.js is using Javascript extraction, which is notably slower and will be re-written in the future. See README.md for more details.');
 }
 const storm = optional;
 
@@ -59,7 +59,7 @@ let lastUsed, protocol;
 let build = 0;
 
 const openArchive = function (file, noCache) {
-  debug('openArchive() : ' + file + ', ' + noCache);
+  log.trace('openArchive() : ' + file + ', ' + noCache);
   let archive, header;
 
   if (!lastUsed || !(lastUsed instanceof MPQArchive) || file !== lastUsed.filename || noCache) {
@@ -114,7 +114,7 @@ const openArchive = function (file, noCache) {
 
 // ensure non-breaking changes
 exports.get = (file, archive) => {
-  debug('get() : ' + file + ', ' + archive);
+  log.debug('get() : ' + file + ', ' + archive);
   if (['darwin', 'linux'].indexOf(process.platform) > -1) {
     return exports.extractFile(file, archive)
   } else {
@@ -124,7 +124,7 @@ exports.get = (file, archive) => {
 
 // returns the content of a file in a replay archive
 exports.extractFileJS = function (archiveFile, archive, keys) {
-  debug('extractFileJS() : ' + archiveFile + ', ' + archive);
+  log.debug('extractFileJS() : ' + archiveFile + ', ' + archive);
   let data;
   archive = openArchive(archive);
 
@@ -138,13 +138,13 @@ exports.extractFileJS = function (archiveFile, archive, keys) {
     if (archive.protocol) {
 
       if ([DETAILS, INITDATA, ATTRIBUTES_EVENTS].indexOf(archiveFile) > -1) {
-        debug('extractFileJS() : ' + archiveFile + ' - parsing file');
+        log.trace('extractFileJS() : ' + archiveFile + ' - parsing file');
         data = archive.data[archiveFile] =
           parseStrings(archive.protocol[decoderMap[archiveFile]](
             archive.readFile(archiveFile)
           ));
       } else if ([GAME_EVENTS, MESSAGE_EVENTS, TRACKER_EVENTS].indexOf(archiveFile) > -1) {
-        debug('extractFileJS() : ' + archiveFile + ' - parsing lines iteratively');
+        log.trace('extractFileJS() : ' + archiveFile + ' - parsing lines iteratively');
 
         if (keys) {
           // protocol function to call is a generator
@@ -172,7 +172,7 @@ exports.extractFileJS = function (archiveFile, archive, keys) {
         }
 
       } else {
-        debug('extractFileJS() : ' + archiveFile + ' - not parsing');
+        log.trace('extractFileJS() : ' + archiveFile + ' - not parsing');
         data = archive.data[archiveFile] = buffer;
       }
 
@@ -194,7 +194,7 @@ exports.extractFiles = (archive) => {
       archive = path.join(process.cwd(), archive);
     }
   }
-  debug('extractFiles() : ' + archive);
+  log.debug('extractFiles() : ' + archive);
   let header = exports.parseHeader(storm.getHeader(archive).content.data);
   let data = [];
 
@@ -218,7 +218,7 @@ exports.extractFile = (file, archive) => {
     }
   }
   let build = exports.getVersion(archive);
-  debug('extractFile() : ' + file + ', ' + archive);
+  log.debug('extractFile() : ' + file + ', ' + archive);
 
   if (file === 'header') {
     return exports.parseHeader(storm.getHeader(archive).content.data);
@@ -226,7 +226,7 @@ exports.extractFile = (file, archive) => {
 
   let result = storm.extractFile(archive, file);
   if (result.success == false) {
-    debug(JSON.stringify(result));
+    log.warn(JSON.stringify(result));
   }
 
   return exports.parseFile(file, result.content.data, build);
@@ -278,16 +278,16 @@ exports.parseFile = function (filename, buffer, build) {
   }
 
   if ([DETAILS, INITDATA, ATTRIBUTES_EVENTS].indexOf(filename) > -1) {
-    debug('parseFile() : ' + filename + " (build " + build + ") - parsing entire file");
+    log.trace('parseFile() : ' + filename + " (build " + build + ") - parsing entire file");
     data = parseStrings(protocol[decoderMap[filename]](buffer));
   } else if ([GAME_EVENTS, MESSAGE_EVENTS, TRACKER_EVENTS].indexOf(filename) > -1) {
-    debug('parseFile() : ' + filename + " (build " + build + ") - parsing lines iteratively");
+    log.trace('parseFile() : ' + filename + " (build " + build + ") - parsing lines iteratively");
     data = [];
     for (let event of protocol[decoderMap[filename]](buffer)) {
       data.push(parseStrings(event));
     }
   } else {
-    debug('parseFile() : ' + filename + " (build " + build + ") - not parsing");
+    log.trace('parseFile() : ' + filename + " (build " + build + ") - not parsing");
     data = buffer;
   }
 
