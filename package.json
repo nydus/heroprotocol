@@ -1,6 +1,6 @@
 {
   "name": "heroprotocol",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Javascript port of the heroprotocol Python library to decode Heroes of the Storm replay protocols.",
   "main": "index.js",
   "dependencies": {
@@ -8,13 +8,20 @@
     "empeeku": "^1.0.2",
     "fs-extra": "^0.26.7",
     "long": "^3.0.3",
+    "pino": "^4.17.5",
     "yargs": "^3.32.0"
+  },
+  "optionalDependencies": {
+    "storm-replay": "^0.3.0-alpha.3"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nydus/heroprotocol.git"
   },
   "scripts": {
+    "preversion": "npm test",
+    "postversion": "git push && git push --tags",
+    "test": "node_modules/mocha/bin/mocha",
     "postinstall": "node postinstall.js"
   },
   "keywords": [
@@ -42,10 +49,12 @@
     "node": ">=4.0.0"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
     "grunt": "latest",
     "grunt-concurrent": "latest",
     "grunt-contrib-jshint": "latest",
     "grunt-contrib-watch": "latest",
-    "grunt-simple-mocha": "latest"
+    "grunt-simple-mocha": "latest",
+    "mocha": "^5.2.0"
   }
 }

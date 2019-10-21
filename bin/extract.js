@@ -12,7 +12,7 @@ const _path = require('path');
 const yargs = require('yargs');
 const heroprotocol = require('../');
 
-const args = yargs.usage('usage: extract.js file|dir ... outdir [-h] [-p] [-r] [-v]\n\nExtracts replays to the given directory or current directory of none is specified. Extracs the full replay by default.')
+const args = yargs.usage('usage: extract.js file|dir ... outdir [-h] [-p] [-r] [-v]\n\nExtracts replays to the given directory or current directory of none is specified. Extracts the full replay by default.')
                   .option('h', { alias: 'help', type: 'boolean', desc: 'show this help' })
                   .option('p', { alias: 'pretty', type: 'boolean', desc: 'prettifies the json' })
                   .option('r', { alias: 'recursive', type: 'boolean', desc: 'scans input folders for replays recursively' })

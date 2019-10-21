@@ -1,11 +1,19 @@
 "use strict";
 
+const log = require('./pino.js');
 const fs = require('fs');
 const path = require('path');
 const MPQArchive = exports.MPQArchive = require('empeeku/mpyq').MPQArchive;
 const protocol29406 = exports.protocol =  require('./lib/protocol29406');
-
 const version = exports.version = require('./package.json').version;
+
+try {
+  var optional = require('storm-replay');
+} catch (err) {
+  optional = null;
+  log.warn('heroprotocol.js is using Javascript extraction, which is notably slower and will be re-written in the future. See README.md for more details.');
+}
+const storm = optional;
 
 // parsable parts
 const HEADER            = exports.HEADER            = 'header';
@@ -15,6 +23,15 @@ const GAME_EVENTS       = exports.GAME_EVENTS       = 'replay.game.events';
 const MESSAGE_EVENTS    = exports.MESSAGE_EVENTS    = 'replay.message.events';
 const TRACKER_EVENTS    = exports.TRACKER_EVENTS    = 'replay.tracker.events';
 const ATTRIBUTES_EVENTS = exports.ATTRIBUTES_EVENTS = 'replay.attributes.events';
+const FILES             = exports.FILES             = [
+  HEADER,
+  DETAILS,
+  INITDATA,
+  GAME_EVENTS,
+  MESSAGE_EVENTS,
+  TRACKER_EVENTS,
+  ATTRIBUTES_EVENTS
+];
 
 const decoderMap = {
   [HEADER]:             'decodeReplayHeader',
@@ -38,9 +55,11 @@ const parseStrings = function parseStrings(data) {
   return data;
 };
 
-let lastUsed;
+let lastUsed, protocol;
+let build = 0;
 
-exports.open = function (file, noCache) {
+const openArchive = function (file, noCache) {
+  log.trace('openArchive() : ' + file + ', ' + noCache);
   let archive, header;
 
   if (!lastUsed || !(lastUsed instanceof MPQArchive) || file !== lastUsed.filename || noCache) {
@@ -70,7 +89,7 @@ exports.open = function (file, noCache) {
     archive.data = {};
     header = archive.data[HEADER] = parseStrings(protocol29406.decodeReplayHeader(archive.header.userDataHeader.content));
     // The header's baseBuild determines which protocol to use
-    archive.baseBuild = header.m_version.m_baseBuild;
+    archive.baseBuild = build = header.m_version.m_baseBuild;
 
     try {
       archive.protocol = require(`./lib/protocol${archive.baseBuild}`);
@@ -93,10 +112,21 @@ exports.open = function (file, noCache) {
   return archive;
 };
 
+// ensure non-breaking changes
+exports.get = (file, archive) => {
+  log.debug('get() : ' + file + ', ' + archive);
+  if (['darwin', 'linux'].indexOf(process.platform) > -1) {
+    return exports.extractFile(file, archive)
+  } else {
+    return exports.extractFileJS(file, archive)
+  }
+}
+
 // returns the content of a file in a replay archive
-exports.get = function (archiveFile, archive, keys) {
+exports.extractFileJS = function (archiveFile, archive, keys) {
+  log.debug('extractFileJS() : ' + archiveFile + ', ' + archive);
   let data;
-  archive = exports.open(archive);
+  archive = openArchive(archive);
 
   if (archive instanceof Error) {
     return data;
@@ -108,11 +138,13 @@ exports.get = function (archiveFile, archive, keys) {
     if (archive.protocol) {
 
       if ([DETAILS, INITDATA, ATTRIBUTES_EVENTS].indexOf(archiveFile) > -1) {
+        log.trace('extractFileJS() : ' + archiveFile + ' - parsing file');
         data = archive.data[archiveFile] =
           parseStrings(archive.protocol[decoderMap[archiveFile]](
             archive.readFile(archiveFile)
           ));
       } else if ([GAME_EVENTS, MESSAGE_EVENTS, TRACKER_EVENTS].indexOf(archiveFile) > -1) {
+        log.trace('extractFileJS() : ' + archiveFile + ' - parsing lines iteratively');
 
         if (keys) {
           // protocol function to call is a generator
@@ -139,12 +171,83 @@ exports.get = function (archiveFile, archive, keys) {
           }
         }
 
+      } else {
+        log.trace('extractFileJS() : ' + archiveFile + ' - not parsing');
+        data = archive.data[archiveFile] = archive.readFile(archiveFile);
       }
 
     }
   }
 
   return data;
+};
+
+/**
+ * extract all files from archive via cpp binding
+ * @function
+ * @param {string} archive - Path of the MPQ archive
+ * @returns {object} Object of files as buffers
+ */
+exports.extractFiles = (archive) => {
+  if (typeof archive === 'string') {
+    if (!path.isAbsolute(archive)) {
+      archive = path.join(process.cwd(), archive);
+    }
+  }
+  log.debug('extractFiles() : ' + archive);
+  let header = exports.parseHeader(storm.getHeader(archive).content.data);
+  let data = [];
+
+  for (var i = FILES.length - 1; i >= 0; i--) {
+    data[FILES[i]] = exports.extractFile(FILES[i], archive);
+  }
+  return data;
+};
+
+/**
+ * extract all files from archive via cpp binding
+ * @function
+ * @param {string} file - Filename to extract
+ * @param {string} archive - Path of the MPQ archive
+ * @returns {object} Object of files as buffers
+ */
+exports.extractFile = (file, archive) => {
+  if (typeof archive === 'string') {
+    if (!path.isAbsolute(archive)) {
+      archive = path.join(process.cwd(), archive);
+    }
+  }
+  let build = exports.getVersion(archive);
+  log.debug('extractFile() : ' + file + ', ' + archive);
+
+  if (file === 'header') {
+    return exports.parseHeader(storm.getHeader(archive).content.data);
+  }
+
+  let result = storm.extractFile(archive, file);
+  if (result.success == false) {
+    log.warn(JSON.stringify(result));
+  }
+
+  return exports.parseFile(file, result.content.data, build);
+};
+
+/**
+ * gets the build version of the replay, and preloads the decoding library
+ * @function
+ * @param {string} archive - Path of the MPQ archive
+ * @returns {integer} Build number
+ */
+exports.getVersion = (archive) => {
+  if (typeof archive === 'string') {
+    if (!path.isAbsolute(archive)) {
+      archive = path.join(process.cwd(), archive);
+    }
+  }
+  let header = exports.parseHeader(storm.getHeader(archive).content.data);
+  protocol = require(`./lib/protocol${header.m_dataBuildNum}`);
+  build = header.m_dataBuildNum;
+  return header.m_dataBuildNum;
 };
 
 /**
@@ -175,13 +278,24 @@ exports.parseFile = function (filename, buffer, build) {
   }
 
   if ([DETAILS, INITDATA, ATTRIBUTES_EVENTS].indexOf(filename) > -1) {
+    log.trace('parseFile() : ' + filename + " (build " + build + ") - parsing entire file");
     data = parseStrings(protocol[decoderMap[filename]](buffer));
   } else if ([GAME_EVENTS, MESSAGE_EVENTS, TRACKER_EVENTS].indexOf(filename) > -1) {
+    log.trace('parseFile() : ' + filename + " (build " + build + ") - parsing lines iteratively");
     data = [];
     for (let event of protocol[decoderMap[filename]](buffer)) {
       data.push(parseStrings(event));
     }
+  } else {
+    log.trace('parseFile() : ' + filename + " (build " + build + ") - not parsing");
+    data = buffer;
   }
 
   return data;
 };
+
+if (storm !== null) {
+  exports.stormVersion = storm.version;
+} else {
+  exports.stormVersion = undefined;
+}
