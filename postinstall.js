@@ -7,7 +7,7 @@ const download = require("download-github-repo");
 const _data = require(path.normalize(__dirname+'/lib/data'));
 const _template = path.normalize(__dirname+'/config/protocol.js.template');
 
-const repository = 'Blizzard/heroprotocol';
+const repository = 'Blizzard/heroprotocol#develop';
 const cloneDir = path.normalize(__dirname+'/src');
 const outDir = path.normalize(__dirname+'/lib');
 
@@ -344,7 +344,7 @@ const Protocol = exports.Protocol = class {
 };
 
 getHeroprotocol().then(() => {
-  const files = fs.readdirSync(cloneDir).filter(file => {
+  const files = fs.readdirSync(`${cloneDir}/heroprotocol/versions`).filter(file => {
     return file.match(/protocol(\d+)\.py$/);
   });
   const successes = [];
@@ -352,7 +352,7 @@ getHeroprotocol().then(() => {
 
   Promise.all(files.map(file => {
     return new Promise((resolve, reject) => {
-      const proto = new Protocol(`${cloneDir}/${file}`);
+      const proto = new Protocol(`${cloneDir}/heroprotocol/versions/${file}`);
       proto.parse().then(() => {
         proto.write().then(() => {
           successes.push(proto.jsName);
