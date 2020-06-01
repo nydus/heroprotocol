@@ -7,7 +7,7 @@ const download = require("download-github-repo");
 const _data = require(path.normalize(__dirname+'/lib/data'));
 const _template = path.normalize(__dirname+'/config/protocol.js.template');
 
-const repository = 'Blizzard/heroprotocol#develop';
+const repository = 'Blizzard/heroprotocol';
 const cloneDir = path.normalize(__dirname+'/src');
 const outDir = path.normalize(__dirname+'/lib');
 
