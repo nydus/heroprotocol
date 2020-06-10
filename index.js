@@ -115,7 +115,7 @@ const openArchive = function (file, noCache) {
 // ensure non-breaking changes
 exports.get = (file, archive) => {
   log.debug('get() : ' + file + ', ' + archive);
-  if (['darwin', 'linux'].indexOf(process.platform) > -1) {
+  if (storm && ['darwin', 'linux'].indexOf(process.platform) > -1) {
     return exports.extractFile(file, archive)
   } else {
     return exports.extractFileJS(file, archive)
