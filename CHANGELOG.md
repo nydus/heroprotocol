@@ -1,6 +1,21 @@
 # Changelog
 
-# latest
+# latest // 2.0.2 - 2020-06-11
+
+- FIX: Better `storm-replay` logic.
+- FIX: Better testing logic to not fail without `storm-replay`
+- FIX: Updated dependencies for vulnerabilities
+
+# 2.0.1 - 2020-06-10
+
+- FIX: Blizzard changed their `heroprotocol` directory structure.
+
+# 2.0.0 - 2018-10-18
+
+- ADD: Sample replays
+- ADD: Logging
+- ADD: Tests
+- ADD: npm versioning
 
 # 2.0.0-alpha
 
