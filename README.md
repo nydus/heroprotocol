@@ -1,9 +1,9 @@
 # heroprotocol
 
-![Works with Node 8](https://img.shields.io/badge/node-%208-brightgreen)
-![Works with Node 10](https://img.shields.io/badge/node-%2010-brightgreen)
-![Works with Node 12](https://img.shields.io/badge/node-%2012-brightgreen)
-![Works with Node 14](https://img.shields.io/badge/node-%2014-brightgreen)
+![Works with Node v8](https://img.shields.io/badge/node%20v8-%20%E2%9C%94-brightgreen)
+![Works with Node v10](https://img.shields.io/badge/node%20v10-%20%E2%9C%94-brightgreen)
+![Works with Node v10](https://img.shields.io/badge/node%20v12-%20%E2%9C%94-brightgreen)
+![Works with Node v10](https://img.shields.io/badge/node%20v14-%20%E2%9C%94-brightgreen)
 
 ***2018-12 Update** Since Blizzard has decided to effectively kill Heroes of the Storm by ending all competitive esports entirely, shifting developers off the game, and “changing the cadence” of updates, I have no longer cared about the game and have halted all development.  Shame, as it was a beloved game for me, but seeing as they completely dropped by the ball by failing to bring the game to market in a timely manner to compete in the MOBA space, my updates to this project will be considered few and very far between.*
 
@@ -112,14 +112,14 @@ Extracts `map.StormReplay` in the `extractionDir` directory in prettified JSON.
 
 The following files are in the archive and supported by the library:
 
-- `replay.details` (see `reference/replay.details.md` for details)
-- `replay.initdata` (see `reference/replay.initdata.md` for details)
+- `replay.details` (see [`reference/replay.details.md`](reference/replay.details.md) for details)
+- `replay.initdata` (see [`reference/replay.initdata.md`](reference/replay.initdata.md) for details)
 - `replay.game.events`
-- `replay.message.events` (see `reference/replay.message.events.md` for details)
-- `replay.tracker.events` (see `reference/replay.tracker.events.md` for details)
+- `replay.message.events` (see [`reference/replay.message.events.md`](reference/replay.message.events.md) for details)
+- `replay.tracker.events` (see [`reference/replay.tracker.events.md`](reference/replay.tracker.events.md) for details)
 - `replay.attributes.events`
 
-Also accessible is the replay header (see `reference/header.md` for details).
+Also accessible is the replay header (see [`reference/header.md`](reference/header.md) for details).
 
 The following files are in the archive but not supported by this port nor the original library yet:
 
