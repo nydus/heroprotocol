@@ -1,10 +1,17 @@
 # heroprotocol
 
-heroprotocol is a Javascript port of [Blizzard/heroprotocol](https://github.com/Blizzard/heroprotocol).
+![Works with Node 8](https://img.shields.io/badge/node-%208-brightgreen)
+![Works with Node 10](https://img.shields.io/badge/node-%2010-brightgreen)
+![Works with Node 12](https://img.shields.io/badge/node-%2012-brightgreen)
+![Works with Node 14](https://img.shields.io/badge/node-%2014-brightgreen)
+
+***2018-12 Update** Since Blizzard has decided to effectively kill Heroes of the Storm by ending all competitive esports entirely, shifting developers off the game, and “changing the cadence” of updates, I have no longer cared about the game and have halted all development.  Shame, as it was a beloved game for me, but seeing as they completely dropped by the ball by failing to bring the game to market in a timely manner to compete in the MOBA space, my updates to this project will be considered few and very far between.*
+
+**heroprotocol** is a Javascript port of [Blizzard/heroprotocol](https://github.com/Blizzard/heroprotocol).
 It is a library and standalone tool to decode Heroes of the Storm replay files into Javascript data
 structures.
 
-Currently heroprotocol can decode these structures and events:
+Currently **heroprotocol** can decode these structures and events:
 
 - replay header
 - game details
@@ -13,12 +20,11 @@ Currently heroprotocol can decode these structures and events:
 - message events
 - tracker events
 
-heroprotocol can be used as a base-build-specific library to decode binary blobs, or it can be run as a standalone tool to pretty print information from supported replay files.
+**heroprotocol** can be used as a base-build-specific library to decode binary blobs, or it can be run as a standalone tool to pretty print information from supported replay files.
 
-The latest version of this library has been tested and passed with builds 44256 and higher of HoTS replays. Although it is unlikely that you should encounter any issues for older versions, no testing has been done for any replays older than 44256.
+The latest version of this library has been tested and passed with build 44256 of HoTS replays. Although it is unlikely that you should encounter any issues for older versions, no testing has been done for any replays older than 44256 nor future replays.
 
-Note that heroprotocol does not expose game balance information or provide any kind of high level analysis of replays; it's meant
-to be just the first tool in the chain for your data mining application.
+Note that **heroprotocol** does not expose game balance information or provide any kind of high level analysis of replays; it's meant to be just the first tool in the chain for your data mining application.
 
 As of version 2.0, MacOS and Linux are using a compiled library (e.g. C++, as opposed to interpreted library, e.g. Javascript) for extraction ([`storm-replay`](https://github.com/nydus/storm-replay)) and results in about 40% faster processing.  If you are on Windows, please upgrade.
 
@@ -34,8 +40,6 @@ believe should be the extraction library.
 Mathieu did a wonderful job with the initial import and product direction, but unfortunately has
 not been as active on the product as I have hoped.  It is with regret that I have to fork to
 continue development, but I hope that Mathieu understands and continues development.
-
-Justin
 
 ## Installation
 
@@ -108,39 +112,39 @@ Extracts `map.StormReplay` in the `extractionDir` directory in prettified JSON.
 
 The following files are in the archive and supported by the library:
 
-- replay.details (see `reference/replay.details.md` for details)
-- replay.initdata (see `reference/replay.initdata.md` for details)
-- replay.game.events
-- replay.message.events (see `reference/replay.message.events.md` for details)
-- replay.tracker.events (see `reference/replay.tracker.events.md` for details)
-- replay.attributes.events
+- `replay.details` (see `reference/replay.details.md` for details)
+- `replay.initdata` (see `reference/replay.initdata.md` for details)
+- `replay.game.events`
+- `replay.message.events` (see `reference/replay.message.events.md` for details)
+- `replay.tracker.events` (see `reference/replay.tracker.events.md` for details)
+- `replay.attributes.events`
 
 Also accessible is the replay header (see `reference/header.md` for details).
 
 The following files are in the archive but not supported by this port nor the original library yet:
 
-- replay.load.info
-- replay.resumable.events
-- replay.server.battlelobby
-- replay.smartcam.events
-- replay.sync.events
-- replay.sync.history
+- `replay.load.info`
+- `replay.resumable.events`
+- `replay.server.battlelobby`
+- `replay.smartcam.events`
+- `replay.sync.events`
+- `replay.sync.history`
 
 ## Supported Versions
 
-heroprotocol supports all protocols avalaible in the original library and can read all replays from retail versions of the game, up to and including patch 16.0. The plan is to port all future versions as they become available.
+**heroprotocol** supports all protocols avalaible in the original library and can read all replays from retail versions of the game, up to and including patch 16.0. The plan is to port all future versions as they become available.
 
 ### How it works
 
-Heroes of the Storm replay files are MPQ archives. heroprotocol uses the mpyq library to read and extract the binary content out of the archive. It then parses the binary content into data structures containing the replay information.
+Heroes of the Storm replay files are MPQ archives. **heroprotocol** uses the `mpyq` library to read and extract the binary content out of the archive. It then parses the binary content into data structures containing the replay information.
 
 The three main files are:
 
-- decoders.js: Contains the binary structures decoders. They are the same for all versions of the game.
-- protocol#####.js: Contains the data structures description of a specific public release of the game.
-- heroprotocol.js: Entry point. Exports the ReplayDecoder and provides the CLI.
+- `decoders.js` - Contains the binary structures decoders. They are the same for all versions of the game.
+- `protocol#####.js` - Contains the data structures description of a specific public release of the game.
+- `heroprotocol.js` - Entry point. Exports the ReplayDecoder and provides the CLI.
 
-heroprotocol.js starts by loading the earliest protocol available, protocol29406.js and uses it to parse the replay header. It then reads the replay build version in the header and loads the associated protocol#####.js containing the correct data structures to parse the full replay.
+`heroprotocol.js` starts by loading the earliest protocol available, `protocol29406.js` and uses it to parse the replay header. It then reads the replay build version in the header and loads the associated `protocol#####.js` containing the correct data structures to parse the full replay.
 
 ## Plans
 
@@ -152,8 +156,6 @@ Any small or big contribution appreciated whether in code, documentation, feedba
 
 [Mathieu Merdy](https://github.com/Farof) for the initial implementation.
 
---
-
 Blizzard Entertainment for making the awesome Heroes of the Storm game and releasing the original [heroprotocol](https://github.com/Blizzard/heroprotocol) tool.
 
 The standalone tool uses a javascript port of [mpyq](https://github.com/arkx/mpyq/) to read mopaq files.
@@ -162,14 +164,8 @@ The standalone tool uses a javascript port of [mpyq](https://github.com/arkx/mpy
 
 Copyright (c) 2016, Justin J. Novack
 
----
-
 Copyright (c) 2016, Mathieu Merdy
 
----
-
 Copyright (c) 2015 Blizzard Entertainment
-
----
 
 Open sourced under the ISC license and MIT license. See the included LICENSE file for more information.
