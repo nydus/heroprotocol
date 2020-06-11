@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+/*jslint node: true */
 "use strict";
 
 const log = require('./pino.js');
@@ -116,11 +118,11 @@ const openArchive = function (file, noCache) {
 exports.get = (file, archive) => {
   log.debug('get() : ' + file + ', ' + archive);
   if (storm) {
-    return exports.extractFile(file, archive)
+    return exports.extractFile(file, archive);
   } else {
-    return exports.extractFileJS(file, archive)
+    return exports.extractFileJS(file, archive);
   }
-}
+};
 
 // returns the content of a file in a replay archive
 exports.extractFileJS = function (archiveFile, archive, keys) {
